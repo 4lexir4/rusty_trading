@@ -21,25 +21,29 @@ impl Orderbook {
     }
 
     fn add_order(&mut self, price: f64, order: Order) {
-        match order.bid_or_ask {
-            BidOrAsk::Bid => {
-                let price = Price::new(price);
-                let limit = self.bids.get_mut(&price);
-                
-                match self.bids.get_mut(&price) {
-                    Some(limit) => {
-                        limit.add_order(order);
-                    }
-                    None => {
-                        let mut limit = Limit::new(price);
-                        limit.add_order(order);
-                        self.bids.insert(price, limit);
-                    }
-                }
-            }
-            BidOrAsk::Ask => {
+        let price = Price::new(price);
 
-            }
+        match order.bid_or_ask {
+            BidOrAsk::Bid => match self.bids.get_mut(&price) {
+                Some(limit) => {
+                    limit.add_order(order);
+                }
+                None => {
+                    let mut limit = Limit::new(price);
+                    limit.add_order(order);
+                    self.bids.insert(price, limit);
+                }
+            },
+            BidOrAsk::Ask => match self.asks.get_mut(&price) {
+                Some(limit) => {
+                    limit.add_order(order);
+                }
+                None => {
+                    let mut limit = Limit::new(price);
+                    limit.add_order(order);
+                    self.asks.insert(price, limit);
+                }
+            },
         }
     }
 }
@@ -55,7 +59,7 @@ impl Price {
     fn new(price: f64) -> Price {
         let scalar = 100000;
         let integral = price as u64;
-        let fractional = ((price % 1.0) * scalar as f64)  as u64;
+        let fractional = ((price % 1.0) * scalar as f64) as u64;
         Price {
             scalar,
             integral,
@@ -102,6 +106,9 @@ fn main() {
     let mut orderbook = Orderbook::new();
     orderbook.add_order(4.4, buy_order);
     orderbook.add_order(4.4, buy_order_2);
+
+    let sell_order = Order::new(BidOrAsk::Ask, 6.5);
+    orderbook.add_order(20.0, sell_order);
 
     println!("{:?}", orderbook);
 }

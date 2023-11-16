@@ -1,4 +1,4 @@
-use super::orderbook::Orderbook;
+use super::orderbook::{Order, Orderbook};
 use std::collections::HashMap;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
@@ -31,5 +31,23 @@ impl MatchingEngine {
     pub fn add_new_market(&mut self, pair: TradingPair) {
         self.orderbooks.insert(pair.clone(), Orderbook::new());
         println!("Opening new orderbook for market {:?}", pair.to_string());
+    }
+
+    pub fn place_limit_order(
+        &mut self,
+        pair: TradingPair,
+        price: f64,
+        order: Order,
+    ) -> Result<(), String> {
+        match self.orderbooks.get_mut(&pair) {
+            Some(orderbook) => {
+                orderbook.add_order(price, order);
+                Ok(())
+            }
+            None => Err(format!(
+                "The orderbook for the given traing pair ({}) does not exist.",
+                pair.to_string()
+            )),
+        }
     }
 }

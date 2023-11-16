@@ -16,5 +16,8 @@ fn main() {
     //println!("{:?}", orderbook);
     let mut engine = MatchingEngine::new();
     let pair = TradingPair::new("BTC".to_string(), "USD".to_string());
-    engine.add_new_market(pair);
+    engine.add_new_market(pair.clone());
+
+    let buy_order_3 = Order::new(BidOrAsk::Bid, 6.5);
+    engine.place_limit_order(pair, 10.000, buy_order_3).unwrap();
 }

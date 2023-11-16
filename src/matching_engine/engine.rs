@@ -11,6 +11,10 @@ impl TradingPair {
     pub fn new(base: String, quote: String) -> TradingPair {
         TradingPair { base, quote }
     }
+
+    pub fn to_string(self) -> String {
+        format!("{}_{}", self.base, self.quote)
+    }
 }
 
 pub struct MatchingEngine {
@@ -26,6 +30,6 @@ impl MatchingEngine {
 
     pub fn add_new_market(&mut self, pair: TradingPair) {
         self.orderbooks.insert(pair.clone(), Orderbook::new());
-        println!("Opening new orderbook for market {:?}", pair);
+        println!("Opening new orderbook for market {:?}", pair.to_string());
     }
 }

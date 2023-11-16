@@ -42,6 +42,8 @@ impl MatchingEngine {
         match self.orderbooks.get_mut(&pair) {
             Some(orderbook) => {
                 orderbook.add_order(price, order);
+
+                println!("Placed limit order at price level {:?}", price);
                 Ok(())
             }
             None => Err(format!(

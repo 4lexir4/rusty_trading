@@ -1,5 +1,7 @@
 use super::orderbook::{Order, Orderbook};
 use std::collections::HashMap;
+// Using the prelude can help importing trait based functions (e.g. core::str::FromStr).
+use rust_decimal::prelude::*;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub struct TradingPair {
@@ -36,12 +38,12 @@ impl MatchingEngine {
     pub fn place_limit_order(
         &mut self,
         pair: TradingPair,
-        price: f64,
+        price: Decimal,
         order: Order,
     ) -> Result<(), String> {
         match self.orderbooks.get_mut(&pair) {
             Some(orderbook) => {
-                orderbook.add_order(price, order);
+                orderbook.add_limit_order(price, order);
 
                 println!("Placed limit order at price level {:?}", price);
                 Ok(())

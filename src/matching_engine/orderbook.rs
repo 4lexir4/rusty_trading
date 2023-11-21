@@ -57,7 +57,7 @@ impl Orderbook {
         limits
     }
 
-    pub fn add_order(&mut self, price: Decimal, order: Order) {
+    pub fn add_limit_order(&mut self, price: Decimal, order: Order) {
         match order.bid_or_ask {
             BidOrAsk::Bid => match self.bids.get_mut(&price) {
                 Some(limit) => {
@@ -158,10 +158,10 @@ pub mod tests {
     #[test]
     fn orderbook_fill_market_order_ask() {
         let mut orderbook = Orderbook::new();
-        orderbook.add_order(dec!(500), Order::new(BidOrAsk::Ask, 10.0));
-        orderbook.add_order(dec!(100), Order::new(BidOrAsk::Ask, 10.0));
-        orderbook.add_order(dec!(200), Order::new(BidOrAsk::Ask, 10.0));
-        orderbook.add_order(dec!(300), Order::new(BidOrAsk::Ask, 10.0));
+        orderbook.add_limit_order(dec!(500), Order::new(BidOrAsk::Ask, 10.0));
+        orderbook.add_limit_order(dec!(100), Order::new(BidOrAsk::Ask, 10.0));
+        orderbook.add_limit_order(dec!(200), Order::new(BidOrAsk::Ask, 10.0));
+        orderbook.add_limit_order(dec!(300), Order::new(BidOrAsk::Ask, 10.0));
 
         let mut market_order = Order::new(BidOrAsk::Bid, 10.0);
         orderbook.fill_market_order(&mut market_order);

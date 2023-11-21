@@ -9,11 +9,11 @@ fn main() {
     let buy_order_2 = Order::new(BidOrAsk::Bid, 2.45);
 
     let mut orderbook = Orderbook::new();
-    orderbook.add_order(dec!(4.4), buy_order);
-    orderbook.add_order(dec!(4.4), buy_order_2);
+    orderbook.add_limit_order(dec!(4.4), buy_order);
+    orderbook.add_limit_order(dec!(4.4), buy_order_2);
 
     let sell_order = Order::new(BidOrAsk::Ask, 6.5);
-    orderbook.add_order(dec!(20.0), sell_order);
+    orderbook.add_limit_order(dec!(20.0), sell_order);
 
     let mut engine = MatchingEngine::new();
     let pair = TradingPair::new("BTC".to_string(), "USD".to_string());

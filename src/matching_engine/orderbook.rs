@@ -25,28 +25,34 @@ impl Orderbook {
     }
 
     pub fn fill_market_order(&mut self, market_order: &mut Order) {
-        match market_order.bid_or_ask {
-            BidOrAsk::Bid => {
-                for limit_order in self.ask_limits() {
-                    limit_order.fill_order(market_order);
+        let limits = match market_order.bid_or_ask {
+            BidOrAsk::Bid => self.ask_limits(),
+            BidOrAsk::Ask => self.bid_limits(),
+        };
 
-                    if market_order.is_filled() {
-                        break;
-                    }
-                }
+        for limit_order in limits {
+            limit_order.fill_order(market_order);
+
+            if market_order.is_filled() {
+                break;
             }
-            BidOrAsk::Ask => {}
         }
     }
 
+    // bid (buy order) -> asks price -> sort by cheapest price
     pub fn ask_limits(&mut self) -> Vec<&mut Limit> {
-        let limits: Vec<&mut Limit> = self.asks.values_mut().collect::<Vec<&mut Limit>>();
+        let mut limits = self.asks.values_mut().collect::<Vec<&mut Limit>>();
+
+        limits.sort_by(|a, b| a.price.cmp(&b.price));
 
         limits
     }
 
+    // ask (sell order) -> bids limits -> sort by highest price
     pub fn bid_limits(&mut self) -> Vec<&mut Limit> {
-        let limits: Vec<&mut Limit> = self.bids.values_mut().collect::<Vec<&mut Limit>>();
+        let mut limits = self.bids.values_mut().collect::<Vec<&mut Limit>>();
+
+        limits.sort_by(|a, b| b.price.cmp(&a.price));
 
         limits
     }
@@ -143,9 +149,31 @@ impl Order {
 
 #[cfg(test)]
 pub mod tests {
+    use std::marker;
+
     use super::*;
     // Procedural macros need importing directly
     use rust_decimal_macros::dec;
+
+    #[test]
+    fn orderbook_fill_market_order_ask() {
+        let mut orderbook = Orderbook::new();
+        orderbook.add_order(dec!(500), Order::new(BidOrAsk::Ask, 10.0));
+        orderbook.add_order(dec!(100), Order::new(BidOrAsk::Ask, 10.0));
+        orderbook.add_order(dec!(200), Order::new(BidOrAsk::Ask, 10.0));
+        orderbook.add_order(dec!(300), Order::new(BidOrAsk::Ask, 10.0));
+
+        let mut market_order = Order::new(BidOrAsk::Bid, 10.0);
+        orderbook.fill_market_order(&mut market_order);
+
+        let ask_limits = orderbook.ask_limits();
+        let matched_limit = ask_limits.get(0).unwrap();
+        assert_eq!(matched_limit.price, dec!(100));
+        assert_eq!(market_order.is_filled(), true);
+
+        let matched_order = matched_limit.orders.get(0).unwrap();
+        assert_eq!(matched_order.is_filled(), true);
+    }
 
     #[test]
     fn limit_total_volume() {

@@ -1,2 +1,4 @@
-# rusty_trading (in development)
-Trading engine in Rust
+# Trading platform (backend from scratch)
+
+Current state:
+- Matching engine

@@ -149,8 +149,6 @@ impl Order {
 
 #[cfg(test)]
 pub mod tests {
-    use std::marker;
-
     use super::*;
     // Procedural macros need importing directly
     use rust_decimal_macros::dec;
